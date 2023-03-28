@@ -119,11 +119,7 @@ We searched for the datasets in the related work papers and the most well-known 
 
 The datasets had different formats like XML, JSON, CSV and text so we unified them all to excel files format.
 
-<br>
-
 We also worked on labeling the datasets with the year label and filtered them to combine our final output.
-
-<br>
 
 All the details are here: [2.5+ Million Rows Egyptian Datasets Collection](https://www.kaggle.com/datasets/mostafanofal/two-million-rows-egyptian-datasets)
 
@@ -165,7 +161,7 @@ In the Arabic language, there is a sort of art called Tashkeel to pronounce word
 
 ![image](Image/pic3.png)																					
 
-​																		Figure 3. Misspelled Correction Methods Comparison <br>
+​																		Figure 3. Misspelled Correction Methods Comparison 
 
 The algorithm of Word embedding with positional encoding goes through these steps:
 
@@ -199,8 +195,6 @@ Selecting the best BERT model is critical because the project's solutions depend
 
 The first approach is to divide our dataset into time periods and train the BERT model from scratch on the collected dataset for some reasons. First it will be easier to train on a dataset from period t1 and test from time t2 which will contain many novel terms and new usages for words and will be easier for testing. The second reason is that it will only be trained in the Egyptian dialect.
 
-<br>
-
 Trained Roberta from scratch [31] on a sample of the dataset from period t1 for only 2 epochs to see quick results and improve later. The results weren't good in figure 6 for both fills in the blank and the word embedding test. The model was unable to predict the correct word for fill in the blank test and outputs only stop-words and outputs almost the same for other sentences. The cosine similarity test for the opposite words is higher than synonyms which is not correct.
 
 <img src="Image/pic6.png" alt="image" style="zoom: 80%;" />
@@ -215,19 +209,11 @@ The model needed a lot of time to complete the training process.
 
 The second approach is to use word embeddings and then clustering the context change. If a word appeared in new context, it will be used with different words that differ from the first context so it will be in another cluster.
 
-<br>
-
 After using the tokenizer of MARBERT and getting the word embeddings of each sentence and its words, We deleted the unique words in the dataset to decrease duplication and save time. The word embedding for each word differs from one sentence to another depending on the context of the sentence.
-
- <br>
 
 We used DBSCAN, affinity propagation, and k-means with a range of k values for clustering. First experiment with K-means we build a function to return the cosine similarity to be used as a metric parameter for K-means instead of Euclidean metric. A cosine similarity metric is a way to improve the result by measuring the similarity between the words. The silhouette score is good by trying different K but not the best result. The problem of K-means needs the number of clusters, but this is hard as the number of words in the corpus is very large and can’t detect these different meanings manually. 
 
-<br>
-
 In a second experiment with DBSCAN, It can categorize the word embeddings of the words and discriminate between noisy data. Epsilon (Eps1) and the minimal number of points/data (MinPoints), two parameters, are based on a user-defined neighbor radius and the number of points already present in the radius. But the issue of DBSCAN in this problem may be that some words are important and are categorized as noise data. In the past
-
-<br>
 
 Affinity propagation has been utilized in a variety of linguistic tasks, including word sense induction. The incremental graph-based method that underlies affinity propagation is somewhat reminiscent of PageRank. Its primary advantage is that the number of clusters is not predetermined but rather inferred during training. Using common hyperparameters, we implemented Scikit-learn in this task. Finally, Affinity Propagation is the appropriate algorithm to apply with a silhouette score of 0.3 as shown in the table because it doesn’t need several clusters on the contrary, it gives us the number of clusters for each word meaning, and if this meaning is changed or not, it would be in a different cluster as shown in figure (4).
 
@@ -239,7 +225,7 @@ Affinity propagation has been utilized in a variety of linguistic tasks, includi
 
 <img src="Image/pic7.png" alt="image" style="zoom:50%;" />
 
-​															Figure 7. The cluster of each Word depends on its word embedding<br>
+​															Figure 7. The cluster of each Word depends on its word embedding
 
 As shown in figure (6) the word “صفرا” has four different meanings so we have different embeddings so each word means to be in a different cluster (4 clusters).
 
@@ -247,7 +233,7 @@ As shown in figure (6) the word “صفرا” has four different meanings so we
 
 ![image](Image/pic8.png)
 
-​																		Figure 8. Examples of words with different meanings<br>
+​																		Figure 8. Examples of words with different meanings
 
 **Limitation**
 
@@ -257,13 +243,11 @@ We can't define an accurate number of clusters because there are too many contex
 
 We found that MARBERT [32] is better than BERT because it is focused on both Dialectal Arabic (DA) and MSA and trained on 1B Arabic tweets from different dialects including the Egyptian, The dataset makes up 128GB of text (15.6B tokens) and 100k word piece. The model outperformed 21 models (75%) and was outperformed by seven models (25%) [33], and achieves the SOTA on 30 out of 43 datasets on 5 tasks (sentiment analysis, social meaning, topic classification, dialect identification, and named entity recognition) [38] and performs best when dealing with dialectal data.
 
-<br>
-
 After trying MARBERT, the results make more sense in figure 9. The predicted answers for the fill in the blank sentence are correct and they are synonyms. The semantic similarity using the cosine similarity metric is high for synonyms and lower for opposite words and much lower for irrelevant words. The word and its opposite could be used in the same context and that’s why the opposite words have higher cosine similarity than the irrelevant ones.
 
 ![image](Image/pic9.png)
 
-​												Figure 9. Test MARBERT for filling in the blanks and the word embedding test<br>
+​												Figure 9. Test MARBERT for filling in the blanks and the word embedding test
 
 **Relevance score solution:**
 
@@ -271,17 +255,15 @@ The solution is based on the context of the sentences. Measuring how relevant th
 
 ![image](Image/pic10.png)
 
-​																				Figure 10. OOV detection challenge solution<br>
+​																				Figure 10. OOV detection challenge solution
 
 Facing the challenge of differentiating between misspelled and novel terms while detecting the out-of-vocabulary (OOV). Figure 10 shows the solution for detecting the novel terms and also the misspelled ones. Given the sentence and target word and after correcting the word if it is in the 100 words predicted by the MARBERT model after masking the target word in the sentence if yes then we use a reward point for measuring the relevance percentage. If the percentage is higher than 50%, then the original word is labeled as misspelled and if not then it's novel.
 
 <img src="Image/pic11.png" alt="image" style="zoom:80%;" />
 
-​																		Figure 11. Computing Relevance and Irrelevance Percentages<br>
+​																		Figure 11. Computing Relevance and Irrelevance Percentages
 
 Measuring the model's loss at the word (Actual loss), the most relevant word (Relevant loss), and a random word not in the top 100 predicted (Irrelevant loss). Distance 1 is the absolute difference between the actual loss and the relevant loss. Distance 2 is the absolute difference between the Actual loss and the irrelevant loss. The total distance equals distance 1 plus distance 2. The relevance percentage equals distance 2 and adds to it the reward point (set to 50% of the actual loss) if the corrected word is in the top predicted 100 then divided by the total distance as illustrated in Figure 11.
-
-<br>
 
 The solution in figure 10 could also be used for detecting the new usages of words with some tiny changes like removing the misspelled correction step and replacing the OOV and misspelled label with new usage and normal respectively.
 
@@ -290,8 +272,6 @@ The solution in figure 10 could also be used for detecting the new usages of wor
 ​																						Figure 12. OOV and Misspelled Test
 
 The solution is tested on a sample of sentences like in figure 12 the solution correctly detects the misspelled and novel words. The word* المشتروع *after correction becomes* المشروع *the percentage of relevance is 92.89 which is higher than 50% and so is labeled as misspelled. On the right, the word* نرم *after correction* نجم and the percentage of relevance is 27.86 which is lower than 50% and so is labeled as a novel word.
-
-<br>
 
 The solution has many hyper-parameters like the number of top predicted words, the value of the reward and penalty points, and the threshold value to say that the word is novel or misspelled.
 
@@ -303,11 +283,9 @@ A more robust general solution was developed with fewer hyper-parameters illustr
 
 ![image](Image/pic14.png)
 
-​																				Figure 14. Measuring the Relevance Score<br>
+​																				Figure 14. Measuring the Relevance Score
 
 Instead of using the top 100 predictions, and using a random irrelevant word other than them, the model predicts a 100k word piece for each mask and so takes the highest and lowest prediction from them as the most relevant and least relevant respectively, and measures the loss at them. The relevance score then is the absolute difference between the actual loss and the least relevant loss divided by the total distance as illustrated in figure 14.
-
-<br>
 
 That solution has only two hyper-parameters which are the threshold of the novel terms and the threshold for new meaning and they are taken as input from the user and the default value is 0.5. Note that the reward and the penalty point could be applied here too. 
 
@@ -347,21 +325,19 @@ Regarding the evaluation dataset. The model trained on data until 2020. We chose
 
 ​																						Figure 17. Goodreads Book Sample
 
-
-
 ## <a name ="22">True Labeling</a>
 
 We selected the list of words for the evaluation based on the four conditions mentioned before and changed the threshold to filter the most accurate words for us.
 
 ![image](Image/pic18.png)
 
-​																						Figure 18. Filter Words Example<br>
+​																						Figure 18. Filter Words Example
 
 Finally for the labeling, we searched for the sentences which include the context change words and used twitter API advanced search to make sure that there were two different contexts for the same word.
 
 ![image](Image/pic19.png)
 
-​																				Figure 19. Searching for word context change<br>
+​																				Figure 19. Searching for word context change
 
 Then we selected 20 sentences for each label putting their true labels manually to compare with our model and the accuracy was around 61%.
 
@@ -375,11 +351,7 @@ When it comes to the comparison between the models. The model made from scratch 
 
 Our deployment plan was integrating our model with a website to make our model easily used by the end user. For designing the front end of the website, we have used HTML, CSS and java script using Dreamweaver.
 
-<br>
-
 The website simply consists of landing page:
-
-<br>
 
 About us page for more information about our project, then the deployment and integration page.
 
